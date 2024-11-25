@@ -61,10 +61,16 @@ Status 200 (OK):
     ```json
    {"message": "API funcionando corretamente!"}
 
-### 📚 Estrutura do Projeto
+---
 
-    ```bash
-        MonitorWork_backend/
+## 🌱 Branch Principal
+
+A branch principal do projeto é a `main`. Esta branch deve conter apenas código funcional e pronto para produção. **Nunca faça commits diretamente na branch `main`!**
+
+
+### 📚 Estrutura do Projeto
+        ```bash
+    MonitorWork_backend/
         ├── src/
         │   ├── controllers/    # Lógica dos controladores
         │   ├── models/         # Modelos de dados
@@ -74,4 +80,4 @@ Status 200 (OK):
         │   └── app.js          # Configuração principal do app
         ├── .env                # Variáveis de ambiente
         ├── package.json        # Dependências e scripts
-        └── README.md           # Documentação
+        └── README.md           # Documentação         
