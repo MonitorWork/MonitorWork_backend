@@ -16,3 +16,20 @@ const pool = new pool ({
 });
 
 
+app.use(bodyParser.json()); //extrair as requisições HTTP
+
+//fazer a listagem dos alunos 
+
+app.get('/alunos', async(req,res)=>{        //função asincrona como callback 
+    try{
+        const result= await pool.query('SELECT * FROM alunos');     //o await faz a "captura" no banco de dados
+        res.json(result.rows); //no final da consulta eu retorno um pacote json
+    }catch(err){        //caso haja um erro na consulta
+        console.error(err);
+        {
+            res.status(500).json({
+                error:'erro em encontrar/listar os Alunos'
+            });
+        }
+    }
+});
