@@ -33,3 +33,22 @@ app.get('/alunos', async(req,res)=>{        //função asincrona como callback
         }
     }
 });
+
+//após fazer a verificação se o aluno esta no banco dados eu posso criar o cadastro desse aluno
+
+
+app.post('/alunos',async(req,res)=>{
+    const { nome, dataNascimento,email}=req.body;
+
+    try{
+        const result = await pool.query(
+            'INSERT INTO alunos (nome, data_nascimento, email) VALUES ($1, $2, $3) RETURNING *',
+            [nome, dataNascimento, email]
+          );
+
+          res.status(201).json(result.rows[0]);
+    }catch(err){
+        console.error(err);
+        res.status(500).json({ error:'erro ao cadastrar Aluno' });
+    }
+});
