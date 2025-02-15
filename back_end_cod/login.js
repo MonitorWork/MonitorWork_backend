@@ -58,5 +58,10 @@ app.post('/alunos',async(req,res)=>{
 app.put('/alunos/:id',async(req,res)=>{
     const {id} =req.parametro;
     const {nome,dataNascimento,email }=req.body;
-    
-})
+    try{
+        const result = await pool.query(
+            'UPDATE alunos SET nome= $1, data_nascimento = &2, email = &3 WHERE id =$4 RETURNING *',
+            [nome,dataNascimento,email,id]
+        );
+    }
+});
