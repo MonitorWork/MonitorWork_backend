@@ -73,3 +73,9 @@ app.put('/alunos/:id',async(req,res)=>{
         res.status(500).json({error:'erro ao atualizar aluno'});
     }
 });
+
+
+app.delete('/alunos/:id',async (req,res)=>{
+    const { id }=req.parametro;
+    
+})
