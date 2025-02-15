@@ -75,8 +75,7 @@ app.put('/alunos/:id',async(req,res)=>{
 });
 
 
-app.delete('/alunos/:id',async (req,res)=>{
-    const { id }=req.parametro;
+app.delete('/alunos/:id', async (req, res) => {
     await Aluno.findByIdAndDelete(req.params.id);
-})
-
+    res.status(204).end();
+  });
