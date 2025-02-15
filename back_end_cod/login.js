@@ -52,3 +52,11 @@ app.post('/alunos',async(req,res)=>{
         res.status(500).json({ error:'erro ao cadastrar Aluno' });
     }
 });
+
+//atualizar cadastro aluno
+
+app.put('/alunos/:id',async(req,res)=>{
+    const {id} =req.parametro;
+    const {nome,dataNascimento,email }=req.body;
+    
+})
