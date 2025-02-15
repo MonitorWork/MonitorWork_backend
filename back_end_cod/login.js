@@ -65,6 +65,8 @@ app.put('/alunos/:id',async(req,res)=>{
         );
         if(result.rows.lenght ===0){
             res.status(404).json({error:'Aluno não encontrado' });
+        }else{
+            res.json(result.rows[0]);
         }
     }
 });
