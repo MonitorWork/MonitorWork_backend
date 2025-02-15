@@ -68,5 +68,8 @@ app.put('/alunos/:id',async(req,res)=>{
         }else{
             res.json(result.rows[0]);
         }
+    }catch(err){
+        console.error(err);
+        res.status(500).json({error:'erro ao atualizar aluno'});
     }
 });
