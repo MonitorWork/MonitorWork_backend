@@ -79,3 +79,9 @@ app.delete('/alunos/:id', async (req, res) => {
     await Aluno.findByIdAndDelete(req.params.id);
     res.status(204).end();
   });
+
+
+// Iniciar o servidor
+app.listen(port, () => {
+    console.log(`Servidor rodando em http://localhost:${port}`);
+  });
