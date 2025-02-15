@@ -63,5 +63,8 @@ app.put('/alunos/:id',async(req,res)=>{
             'UPDATE alunos SET nome= $1, data_nascimento = &2, email = &3 WHERE id =$4 RETURNING *',
             [nome,dataNascimento,email,id]
         );
+        if(result.rows.lenght ===0){
+            res.status(404).json({error:'Aluno não encontrado' });
+        }
     }
 });
