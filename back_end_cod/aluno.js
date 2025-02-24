@@ -45,6 +45,12 @@ app.put('/alunos/:id',async(req,res)=>{
 
 });
 
+//receber a listagem dos alunos
+app.get('/alunos', async (req, res) => {
+    const alunos = await prisma.user.findMany();
+    res.status(200).json(alunos);
+});
+
 app.listen(3000, () => {
     console.log('Servidor rodando na porta 3000');
 });
