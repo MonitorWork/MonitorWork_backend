@@ -23,6 +23,9 @@ pp.post('/alunos', async (req, res) =>{
     res.status(201).json(novoAluno);
 }) ;
 
+
+app.put('/alunos/:id',async(req,res));
+
 app.listen(3000, () => {
     console.log('Servidor rodando na porta 3000');
 });
