@@ -39,9 +39,10 @@ app.put('/alunos/:id',async(req,res)=>{
             },
         });
         res.status(200).json(alunoAtualizado);
-    }catch{
-
+    }catch(error){
+        res.status(404).json({error:"aluno não encontrado"});
     }
+
 });
 
 app.listen(3000, () => {
