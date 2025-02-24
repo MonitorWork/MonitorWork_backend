@@ -32,3 +32,12 @@ app.post('/disciplinas', async (req, res) => {
 
     res.status(201).json(disciplina);
 });
+
+/** Listar todas as disciplinas com os dados dos professores */
+app.get('/disciplinas', async (req, res) => {
+    const disciplinas = await prisma.discipline.findMany({
+        include: { professor: true }
+    });
+
+    res.status(200).json(disciplinas);
+});
