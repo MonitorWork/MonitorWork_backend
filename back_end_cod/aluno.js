@@ -15,14 +15,15 @@ pp.post('/alunos', async (req, res) =>{
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    
+
     const idade = age !== undefined && age !== null ? String(age) : null;
 
     const novoAluno = await prisma.user.create({
         data: {
             email,
             name: nome, 
-            age: idade,  
+            age: idade,
+            password: hashedPassword,
         },
     });
     res.status(201).json(novoAluno);
