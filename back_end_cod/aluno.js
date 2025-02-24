@@ -7,6 +7,10 @@ app.use(express.json());
 //criar o campo que comunica com o banco
 pp.post('/alunos', async (req, res) =>{
     const {email , nome ,age } =req.body;
+
+    if(!email || !nome){
+        
+    }
 }
 
 ) 
