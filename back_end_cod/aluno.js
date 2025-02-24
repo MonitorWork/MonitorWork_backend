@@ -9,8 +9,10 @@ pp.post('/alunos', async (req, res) =>{
     const {email , nome ,age } =req.body;
 
     if(!email || !nome){
-        
+        return res.status(400).json({ error: 'Email e nome são obrigatórios' });
     }
+    const idade = age !== undefined && age !== null ? String(age) : null;
+
 }
 
 ) 
