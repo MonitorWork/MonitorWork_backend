@@ -4,8 +4,12 @@ const prisma = new PrismaClient();
 const app = express();
 app.use(express.json());
 
+//criar o campo que comunica com o banco
+pp.post('/alunos', async (req, res) =>{
+    const {email , nome ,age } =req.body;
+}
 
-pp.post('/alunos', async (req, res)) //criar o campo que comunica com o banco
+) 
 
 app.listen(3000, () => {
     console.log('Servidor rodando na porta 3000');
