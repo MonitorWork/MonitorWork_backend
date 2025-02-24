@@ -7,5 +7,9 @@ app.use(express.json());
 
 
 app.post('/disciplinas', async (req, res) => {
-    
+    const { name, professorId } = req.body;
+
+    if (!name || !professorId) {
+        return res.status(400).json({ error: 'Nome da disciplina e ID do professor são obrigatórios' });
+    }
 });
