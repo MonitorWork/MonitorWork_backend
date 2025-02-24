@@ -41,3 +41,22 @@ app.get('/disciplinas', async (req, res) => {
 
     res.status(200).json(disciplinas);
 });
+
+/** Atualizar uma disciplina */
+app.put('/disciplinas/:id', async (req, res) => {
+    const { id } = req.params;
+    const { name, professorId } = req.body;
+
+    try {
+        const disciplinaAtualizada = await prisma.discipline.update({
+            where: { id },
+            data: { name, professorId },
+            include: { professor: true }
+        });
+
+        res.status(200).json(disciplinaAtualizada);
+    } catch (error) {
+        console.error('Erro ao atualizar disciplina:', error);
+        res.status(500).json({ error: 'Erro interno ao atualizar disciplina' });
+    }
+});
