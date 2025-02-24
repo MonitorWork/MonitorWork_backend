@@ -13,9 +13,14 @@ pp.post('/alunos', async (req, res) =>{
     }
     const idade = age !== undefined && age !== null ? String(age) : null;
 
-    const novoAluno=await prisma.user.create({
-        
-    })
+    const novoAluno = await prisma.user.create({
+        data: {
+            email,
+            name: nome, 
+            age: idade,  
+        },
+    });
+
 
 }
 
