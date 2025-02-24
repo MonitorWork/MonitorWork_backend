@@ -42,7 +42,12 @@ app.post('/login', async (req, res) => {
     }
 
     const senhaCorreta = await bcrypt.compare(password, user.password);
-}
+    if (!senhaCorreta) {
+        return res.status(401).json({ error: 'Senha incorreta' });
+    }
+
+    res.status(200).json({ message: 'Login bem-sucedido!' });
+});
 
 
 app.put('/alunos/:id',async(req,res)=>{
