@@ -1,13 +1,14 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
+
 const prisma = new PrismaClient();
 const app = express();
 app.use(express.json());
 
 //criar o campo que comunica com o banco
 pp.post('/alunos', async (req, res) =>{
-    const {email , nome ,age } =req.body;
+    const {email , nome ,age ,passaword} =req.body;
 
     if(!email || !nome){
         return res.status(400).json({ error: 'Email e nome são obrigatórios' });
