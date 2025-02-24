@@ -12,16 +12,24 @@ datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")
 }
-
 model Professor {
-  id           String  @id @default(auto()) @map("_id") @db.ObjectId
+  id           String      @id @default(auto()) @map("_id") @db.ObjectId
   name         String
   age          String?
-  email        String  @unique
-  universityId String  @unique
+  email        String      @unique
+  universityId String
   subject      String
   password     String
+  disciplines  Discipline[] // Relacionamento: Um professor pode ter várias disciplinas
 }
+
+model Discipline {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  professorId String    @db.ObjectId
+  professor   Professor @relation(fields: [professorId], references: [id])
+}
+
 
 
 model User {
