@@ -60,3 +60,19 @@ app.put('/disciplinas/:id', async (req, res) => {
         res.status(500).json({ error: 'Erro interno ao atualizar disciplina' });
     }
 });
+
+/** Deletar uma disciplina */
+app.delete('/disciplinas/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        await prisma.discipline.delete({
+            where: { id }
+        });
+
+        res.status(204).send();
+    } catch (error) {
+        console.error('Erro ao deletar disciplina:', error);
+        res.status(500).json({ error: 'Erro interno ao deletar disciplina' });
+    }
+});
