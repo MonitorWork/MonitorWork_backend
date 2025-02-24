@@ -10,7 +10,7 @@ app.use(express.json());
 pp.post('/alunos', async (req, res) =>{
     const {email , nome ,age ,passaword} =req.body;
 
-    if(!email || !nome){
+    if(!email || !nome || passaword){
         return res.status(400).json({ error: 'Email e nome são obrigatórios' });
     }
     const idade = age !== undefined && age !== null ? String(age) : null;
