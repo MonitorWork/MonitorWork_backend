@@ -54,6 +54,10 @@ app.get('/alunos', async (req, res) => {
 //delete
 app.delete('/alunos/:id', async (req, res)=> {
     const { id } = req.params;
+    try {
+        await prisma.user.delete({
+            where: { id },
+        });
 
 );
 app.listen(3000, () => {
