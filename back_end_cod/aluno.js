@@ -32,6 +32,13 @@ app.put('/alunos/:id',async(req,res)=>{
             where:{
                 id:req.params.id,
             },
+            data: {
+                email,
+                name: nome,
+                age: idade,
+            },
+        });
+        res.status(200).json(alunoAtualizado);
     }catch{
 
     }
