@@ -52,15 +52,21 @@ app.get('/alunos', async (req, res) => {
 });
 
 //delete
-app.delete('/alunos/:id', async (req, res)=> {
+app.delete('/alunos/:id', async (req, res) => {
     const { id } = req.params;
+
     try {
         await prisma.user.delete({
             where: { id },
         });
-        return res.status(204).send('usuario deletado com sucesso'); 
 
-);
+        return res.status(204).send('usuario deletado com sucesso'); 
+    } catch (error) {
+        console.error('Erro ao deletar aluno:', error);
+        return res.status(500).json({ error: 'Erro interno ao deletar aluno' });
+    }
+});
+
 app.listen(3000, () => {
     console.log('Servidor rodando na porta 3000');
 });
