@@ -52,7 +52,10 @@ app.get('/alunos', async (req, res) => {
 });
 
 //delete
-app.delete('/alunos/:id', async (req, res));
+app.delete('/alunos/:id', async (req, res)=> {
+    const { id } = req.params;
+
+);
 app.listen(3000, () => {
     console.log('Servidor rodando na porta 3000');
 });
