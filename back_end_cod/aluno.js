@@ -14,7 +14,8 @@ pp.post('/alunos', async (req, res) =>{
         return res.status(400).json({ error: 'Email e nome são obrigatórios' });
     }
 
-    const hashedPassord;
+    const hashedPassword = await bcrypt.hash(password, 10);
+    
     const idade = age !== undefined && age !== null ? String(age) : null;
 
     const novoAluno = await prisma.user.create({
