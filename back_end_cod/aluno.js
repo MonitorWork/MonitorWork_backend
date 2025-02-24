@@ -40,6 +40,8 @@ app.post('/login', async (req, res) => {
     if (!user) {
         return res.status(404).json({ error: 'Usuário não encontrado' });
     }
+
+    const senhaCorreta = await bcrypt.compare(password, user.password);
 }
 
 
