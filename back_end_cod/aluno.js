@@ -58,6 +58,7 @@ app.delete('/alunos/:id', async (req, res)=> {
         await prisma.user.delete({
             where: { id },
         });
+        return res.status(204).send('usuario deletado com sucesso'); 
 
 );
 app.listen(3000, () => {
