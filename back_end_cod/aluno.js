@@ -24,7 +24,9 @@ pp.post('/alunos', async (req, res) =>{
 }) ;
 
 
-app.put('/alunos/:id',async(req,res));
+app.put('/alunos/:id',async(req,res)=>{
+    const {email ,nome ,age} = req.body;
+});
 
 app.listen(3000, () => {
     console.log('Servidor rodando na porta 3000');
