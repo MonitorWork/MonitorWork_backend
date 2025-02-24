@@ -27,6 +27,11 @@ pp.post('/alunos', async (req, res) =>{
 app.put('/alunos/:id',async(req,res)=>{
     const {email ,nome ,age} = req.body;
     const idade= age !== undefined && age !==null ? string (age):null
+    try{
+        
+    }catch{
+
+    }
 });
 
 app.listen(3000, () => {
