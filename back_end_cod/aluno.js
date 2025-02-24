@@ -28,7 +28,10 @@ app.put('/alunos/:id',async(req,res)=>{
     const {email ,nome ,age} = req.body;
     const idade= age !== undefined && age !==null ? string (age):null
     try{
-        
+        const alunoAtualizado=await prisma.user.update({
+            where:{
+                id:req.params.id,
+            },
     }catch{
 
     }
