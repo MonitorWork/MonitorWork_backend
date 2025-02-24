@@ -76,3 +76,14 @@ app.delete('/disciplinas/:id', async (req, res) => {
         res.status(500).json({ error: 'Erro interno ao deletar disciplina' });
     }
 });
+
+/** Fechar conexão do Prisma ao encerrar o servidor */
+process.on('SIGINT', async () => {
+    console.log('Desconectando Prisma...');
+    await prisma.$disconnect();
+    process.exit();
+});
+
+app.listen(3000, () => {
+    console.log('Servidor rodando na porta 3000');
+});
