@@ -51,6 +51,8 @@ app.get('/alunos', async (req, res) => {
     res.status(200).json(alunos);
 });
 
+//delete
+app.delete('/alunos/:id', async (req, res));
 app.listen(3000, () => {
     console.log('Servidor rodando na porta 3000');
 });
