@@ -67,6 +67,13 @@ app.delete('/alunos/:id', async (req, res) => {
     }
 });
 
+//fechar o servidor
+process.on('SIGINT', async () => {
+    console.log('Desconectando Prisma...');
+    await prisma.$disconnect();
+    process.exit();
+});
+
 app.listen(3000, () => {
     console.log('Servidor rodando na porta 3000');
 });
