@@ -6,100 +6,121 @@ const prisma = new PrismaClient();
 const app = express();
 app.use(express.json());
 
-//criar o campo que comunica com o banco
+// Criar um novo aluno no banco de dados
+app.post('/alunos', async (req, res) => {
+    try {
+        const { email, nome, age, password } = req.body;
 
-pp.post('/alunos', async (req, res) =>{
-    const {email , nome ,age ,passaword} =req.body;
+        if (!email || !nome || !password) {
+            return res.status(400).json({ error: 'Email, nome e senha são obrigatórios' });
+        }
 
-    if(!email || !nome || passaword){
-        return res.status(400).json({ error: 'Email e nome são obrigatórios' });
-    }
-    
-    const hashedPassword = await bcrypt.hash(password, 10);
-    
-    const idade = age !== undefined && age !== null ? String(age) : null;
-    
-    const novoAluno = await prisma.user.create({
-        data: {
-            email,
-            name: nome, 
-            age: idade,
-            password: hashedPassword,
-        },
-    });
-    res.status(201).json(novoAluno);
-}) ;
+        const hashedPassword = await bcrypt.hash(password, 10);
 
-//autenticar login
-app.post('/login', async (req, res) => {
-    const { email, password } = req.body;
-
-    const user = await prisma.user.findUnique({
-        where: { email },
-    });
-    if (!user) {
-        return res.status(404).json({ error: 'Usuário não encontrado' });
-    }
-
-    const senhaCorreta = await bcrypt.compare(password, user.password);
-    if (!senhaCorreta) {
-        return res.status(401).json({ error: 'Senha incorreta' });
-    }
-
-    res.status(200).json({ message: 'Login bem-sucedido!' });
-});
-
-
-app.put('/alunos/:id',async(req,res)=>{
-    const {email ,nome ,age} = req.body;
-    const idade= age !== undefined && age !==null ? string (age):null
-    try{
-        const alunoAtualizado=await prisma.user.update({
-            where:{
-                id:req.params.id,
-            },
+        const novoAluno = await prisma.user.create({
             data: {
                 email,
                 name: nome,
-                age: idade,
+                age: age ? String(age) : null,
+                password: hashedPassword,
             },
         });
-        res.status(200).json(alunoAtualizado);
-    }catch(error){
-        res.status(404).json({error:"aluno não encontrado"});
+
+        res.status(201).json(novoAluno);
+    } catch (error) {
+        console.error('Erro ao criar aluno:', error);
+        res.status(500).json({ error: 'Erro interno ao criar aluno' });
     }
-
 });
 
-//receber a listagem dos alunos
-app.get('/alunos', async (req, res) => {
-    const alunos = await prisma.user.findMany();
-    res.status(200).json(alunos);
-});
-
-//delete
-app.delete('/alunos/:id', async (req, res) => {
-    const { id } = req.params;
-
+// Autenticação de login
+app.post('/login', async (req, res) => {
     try {
+        const { email, password } = req.body;
+
+        const user = await prisma.user.findUnique({
+            where: { email },
+        });
+
+        if (!user) {
+            return res.status(404).json({ error: 'Usuário não encontrado' });
+        }
+
+        const senhaCorreta = await bcrypt.compare(password, user.password);
+        if (!senhaCorreta) {
+            return res.status(401).json({ error: 'Senha incorreta' });
+        }
+
+        res.status(200).json({ message: 'Login bem-sucedido!' });
+    } catch (error) {
+        console.error('Erro ao autenticar login:', error);
+        res.status(500).json({ error: 'Erro interno ao autenticar login' });
+    }
+});
+
+// Atualizar um aluno
+app.put('/alunos/:id', async (req, res) => {
+    try {
+        const { email, nome, age, password } = req.body;
+        const { id } = req.params;
+
+        let dataUpdate = {
+            email,
+            name: nome,
+            age: age ? String(age) : null,
+        };
+
+        if (password) {
+            dataUpdate.password = await bcrypt.hash(password, 10);
+        }
+
+        const alunoAtualizado = await prisma.user.update({
+            where: { id },
+            data: dataUpdate,
+        });
+
+        res.status(200).json(alunoAtualizado);
+    } catch (error) {
+        console.error('Erro ao atualizar aluno:', error);
+        res.status(500).json({ error: 'Erro interno ao atualizar aluno' });
+    }
+});
+
+// Listar todos os alunos
+app.get('/alunos', async (req, res) => {
+    try {
+        const alunos = await prisma.user.findMany();
+        res.status(200).json(alunos);
+    } catch (error) {
+        console.error('Erro ao listar alunos:', error);
+        res.status(500).json({ error: 'Erro interno ao buscar alunos' });
+    }
+});
+
+// Deletar um aluno
+app.delete('/alunos/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+
         await prisma.user.delete({
             where: { id },
         });
 
-        return res.status(204).send('usuario deletado com sucesso'); 
+        res.status(204).send();
     } catch (error) {
         console.error('Erro ao deletar aluno:', error);
-        return res.status(500).json({ error: 'Erro interno ao deletar aluno' });
+        res.status(500).json({ error: 'Erro interno ao deletar aluno' });
     }
 });
 
-//fechar o servidor
+// Fechar conexão do Prisma ao encerrar o servidor
 process.on('SIGINT', async () => {
     console.log('Desconectando Prisma...');
     await prisma.$disconnect();
     process.exit();
 });
 
+// Iniciar o servidor
 app.listen(3000, () => {
     console.log('Servidor rodando na porta 3000');
 });
