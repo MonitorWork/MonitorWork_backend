@@ -34,8 +34,10 @@ pp.post('/alunos', async (req, res) =>{
 app.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
-    
+    const user = await prisma.user.findUnique({
+        where: { email },
     });
+
 
 app.put('/alunos/:id',async(req,res)=>{
     const {email ,nome ,age} = req.body;
