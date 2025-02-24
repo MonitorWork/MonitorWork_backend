@@ -37,6 +37,10 @@ app.post('/login', async (req, res) => {
     const user = await prisma.user.findUnique({
         where: { email },
     });
+    if (!user) {
+        return res.status(404).json({ error: 'Usuário não encontrado' });
+    }
+}
 
 
 app.put('/alunos/:id',async(req,res)=>{
