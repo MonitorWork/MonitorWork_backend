@@ -7,17 +7,18 @@ const app = express();
 app.use(express.json());
 
 //criar o campo que comunica com o banco
+
 pp.post('/alunos', async (req, res) =>{
     const {email , nome ,age ,passaword} =req.body;
 
     if(!email || !nome || passaword){
         return res.status(400).json({ error: 'Email e nome são obrigatórios' });
     }
-
+    
     const hashedPassword = await bcrypt.hash(password, 10);
-
+    
     const idade = age !== undefined && age !== null ? String(age) : null;
-
+    
     const novoAluno = await prisma.user.create({
         data: {
             email,
@@ -30,6 +31,7 @@ pp.post('/alunos', async (req, res) =>{
 }) ;
 
 //autenticar login
+app.post('/login',async)
 
 app.put('/alunos/:id',async(req,res)=>{
     const {email ,nome ,age} = req.body;
