@@ -31,7 +31,11 @@ pp.post('/alunos', async (req, res) =>{
 }) ;
 
 //autenticar login
-app.post('/login',async)
+app.post('/login', async (req, res) => {
+    const { email, password } = req.body;
+
+    
+    });
 
 app.put('/alunos/:id',async(req,res)=>{
     const {email ,nome ,age} = req.body;
