@@ -119,7 +119,7 @@ app.get('/perfil', autenticarToken, async (req, res) => {
     try {
         const professor = await prisma.professor.findUnique({
             where: { id: req.user.id },
-            select: { id: true, email: true, name: true, telefone: true, universityId: true, subject: true }
+            select: { id: true, email: true, name: true, telefone: true, universityId: true, disciplina: true }
         });
 
         if (!professor) {
