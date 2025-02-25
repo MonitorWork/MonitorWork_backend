@@ -1,16 +1,39 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const prisma = new PrismaClient();
 const app = express();
 app.use(express.json());
 
-/** Criar uma matéria vinculada a um professor */
-app.post('/disciplinas', async (req, res) => {
+const SECRET_KEY = process.env.JWT_SECRET || 'minha_chave_secreta_super_segura';
+
+// 📌 Middleware para autenticação com JWT
+const autenticarToken = (req, res, next) => {
+    const token = req.headers.authorization?.split(' ')[1];
+
+    if (!token) {
+        return res.status(401).json({ error: 'Acesso negado. Token não fornecido.' });
+    }
+
+    try {
+        const decoded = jwt.verify(token, SECRET_KEY);
+        req.user = decoded;
+        next();
+    } catch (error) {
+        return res.status(403).json({ error: 'Token inválido ou expirado.' });
+    }
+};
+
+// 📌 Criar uma matéria vinculada a um professor (rota protegida)
+app.post('/disciplinas', autenticarToken, async (req, res) => {
     const { name, professorId } = req.body;
 
     if (!name || !professorId) {
-        return res.status(400).json({ error: 'Nome da disciplina e ID do professor são obrigatórios' });
+        return res.status(400).json({ error: 'Nome da disciplina e ID do professor são obrigatórios' });
     }
 
     // Verificar se o professor existe
@@ -19,22 +42,19 @@ app.post('/disciplinas', async (req, res) => {
     });
 
     if (!professor) {
-        return res.status(404).json({ error: 'Professor não encontrado' });
+        return res.status(404).json({ error: 'Professor não encontrado' });
     }
 
     const disciplina = await prisma.discipline.create({
-        data: {
-            name,
-            professorId
-        },
-        include: { professor: true } // Retorna os dados do professor junto com a disciplina
+        data: { name, professorId },
+        include: { professor: true }
     });
 
     res.status(201).json(disciplina);
 });
 
-/** Listar todas as disciplinas com os dados dos professores */
-app.get('/disciplinas', async (req, res) => {
+// 📌 Listar todas as disciplinas com os dados dos professores (rota protegida)
+app.get('/disciplinas', autenticarToken, async (req, res) => {
     const disciplinas = await prisma.discipline.findMany({
         include: { professor: true }
     });
@@ -42,8 +62,8 @@ app.get('/disciplinas', async (req, res) => {
     res.status(200).json(disciplinas);
 });
 
-/** Atualizar uma disciplina */
-app.put('/disciplinas/:id', async (req, res) => {
+// 📌 Atualizar uma disciplina (rota protegida)
+app.put('/disciplinas/:id', autenticarToken, async (req, res) => {
     const { id } = req.params;
     const { name, professorId } = req.body;
 
@@ -61,15 +81,12 @@ app.put('/disciplinas/:id', async (req, res) => {
     }
 });
 
-/** Deletar uma disciplina */
-app.delete('/disciplinas/:id', async (req, res) => {
+// 📌 Deletar uma disciplina (rota protegida)
+app.delete('/disciplinas/:id', autenticarToken, async (req, res) => {
     const { id } = req.params;
 
     try {
-        await prisma.discipline.delete({
-            where: { id }
-        });
-
+        await prisma.discipline.delete({ where: { id } });
         res.status(204).send();
     } catch (error) {
         console.error('Erro ao deletar disciplina:', error);
@@ -77,7 +94,7 @@ app.delete('/disciplinas/:id', async (req, res) => {
     }
 });
 
-/** Fechar conexão do Prisma ao encerrar o servidor */
+// 📌 Fechar conexão do Prisma ao encerrar o servidor
 process.on('SIGINT', async () => {
     console.log('Desconectando Prisma...');
     await prisma.$disconnect();
@@ -85,5 +102,5 @@ process.on('SIGINT', async () => {
 });
 
 app.listen(3000, () => {
-    console.log('Servidor rodando na porta 3000');
+    console.log('Servidor rodando na porta 3000');
 });
