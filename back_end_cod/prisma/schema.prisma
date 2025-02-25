@@ -20,8 +20,10 @@ model Professor {
   universityId String
   subject      String
   password     String
+  telefone     String      @unique
   disciplines  Discipline[] // Relacionamento: Um professor pode ter várias disciplinas
 }
+
 
 model Discipline {
   id          String    @id @default(auto()) @map("_id") @db.ObjectId
