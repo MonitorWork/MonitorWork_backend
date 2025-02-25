@@ -2,14 +2,12 @@
 
 ## 📋 Descrição
 
-O **MonitorWork** é um software projetado para conectar alunos com monitores de outras universidades e oferecer supervisão de professores de diferentes instituições. A plataforma permite o agendamento de monitorias, registro de histórico de atividades e oferece funcionalidades adicionais para aprimorar a experiência de aprendizagem.
+O **MonitorWork** é um software projetado para conectar alunos com monitores de outras universidades e oferecer contato atráves da nossa pagina, no qual tem a função de ser um "placeholder
 
 ### Principais funcionalidades planejadas:
-- **Cadastro de usuários**: Aluno, Monitor e Professor.
-- **Validação de monitores**: Envio de documento que comprove a matrícula ativa e o status de monitor no semestre corrente.
+- **Cadastro de usuários**: Aluno, Monitor.
+- **Validação de monitores**: Requer um universetyID.
 - **Histórico de monitorias**: Registro das sessões realizadas, incluindo data, duração e participantes.
-- **Bloco de notas integrado**: Ferramenta para que alunos anotem informações importantes e monitores possam salvar prints diretamente no sistema.
-
 ---
 
 ## 🚀 Começando
@@ -20,8 +18,10 @@ Siga as instruções abaixo para configurar o projeto localmente.
 
 Certifique-se de ter os seguintes softwares instalados em sua máquina:
 - **Node.js** (versão 16 ou superior)
+- **EXPRESS** (FRAMEWORK)
 - **npm** (gerenciador de pacotes do Node.js)
-- **MySQL** (banco de dados)
+- **MongoDB** (banco de dados)
+- **Prisma**(servidor HHTP)
 
 ---
 
@@ -39,13 +39,12 @@ Certifique-se de ter os seguintes softwares instalados em sua máquina:
 3. **Configure as variáveis de ambiente:**
 Crie um arquivo .env na raiz do projeto com as seguintes variáveis:
     ```env
-    PORT=3000
-    DB_URI=mysql://usuario:senha@localhost:3306/nome_do_banco
-
+     DATABASE_URL="mongodb+srv://matheusr:H9UUSWBaWteDO98z@cluster0.0gqsi.mongodb.net/Users?retryWrites=true&w=majority&appName=Cluster0"
 4. **Configure o banco de dados:**
-Certifique-se de que o MySQL está em execução e crie o banco de dados necessário:
+Certifique-se de que o mongodb está em execução e crie o banco de dados necessário:
     ```sql
-    CREATE DATABASE monitor_work;
+   npx prisma db push
+   npx prisma studio
 
 5. **Inicie o servidor:**
     ```bash
