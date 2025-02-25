@@ -1,83 +1,160 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+import cors from 'cors';
+
+app.use(cors({
+    origin: '*', // Permite requisições de qualquer origem (modifique conforme necessário)
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos HTTP permitidos
+    allowedHeaders: ['Content-Type', 'Authorization'] // Cabeçalhos permitidos
+}));
+
+
+dotenv.config();
 
 const prisma = new PrismaClient();
 const app = express();
 app.use(express.json());
 
-// Criar um professor com senha segura
+const SECRET_KEY = process.env.JWT_SECRET || 'minha_chave_secreta_super_segura';
+
+// Criar um novo professor no banco de dados
 app.post('/professores', async (req, res) => {
-    const { name, age, email, universityId, subject, password } = req.body;
+    try {
+        const { nome, age, telefone, universityId, disciplina, email, password } = req.body;
 
-    if (!name || !email || !universityId || !subject || !password) {
-        return res.status(400).json({ error: 'Nome, email, registro universitário, disciplina e senha são obrigatórios' });
+        // Validar se os campos obrigatórios foram fornecidos
+        if (!nome || !email || !password || !universityId || !disciplina || !telefone) {
+            return res.status(400).json({ error: 'Nome, email, senha, ID da universidade, disciplina e telefone são obrigatórios' });
+        }
+
+        // Verificar se já existe um professor com o mesmo e-mail ou telefone
+        const professorExistente = await prisma.professor.findFirst({
+            where: {
+                OR: [
+                    { email },
+                    { telefone }
+                ]
+            }
+        });
+
+        if (professorExistente) {
+            return res.status(400).json({ error: 'Já existe um professor com esse e-mail ou telefone' });
+        }
+
+        // Criptografar a senha do professor
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Criar o novo professor no banco de dados
+        const novoProfessor = await prisma.professor.create({
+            data: {
+                name: nome,
+                age: age ? String(age) : null, // Convertendo a idade para string (caso fornecido)
+                telefone,
+                universityId,
+                subject: disciplina,
+                email,
+                password: hashedPassword,
+            },
+        });
+
+        res.status(201).json(novoProfessor);
+    } catch (error) {
+        console.error('Erro ao criar professor:', error);
+        res.status(500).json({ error: 'Erro interno ao criar professor' });
     }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const professor = await prisma.professor.create({
-        data: {
-            name,
-            age: age ? String(age) : null,
-            email,
-            universityId,
-            subject,
-            password: hashedPassword,
-        },
-    });
-
-    res.status(201).json({ message: 'Professor cadastrado com sucesso!' });
 });
 
-// Autenticação de professor (login)
-app.post('/professores/login', async (req, res) => {
-    const { email, password } = req.body;
+// Autenticação de login para o professor
+app.post('/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
 
-    const professor = await prisma.professor.findUnique({
-        where: { email },
-    });
+        const professor = await prisma.professor.findUnique({
+            where: { email },
+        });
 
-    if (!professor) {
-        return res.status(404).json({ error: 'Professor não encontrado' });
+        if (!professor) {
+            return res.status(404).json({ error: 'Professor não encontrado' });
+        }
+
+        const senhaCorreta = await bcrypt.compare(password, professor.password);
+        if (!senhaCorreta) {
+            return res.status(401).json({ error: 'Senha incorreta' });
+        }
+
+        const token = jwt.sign(
+            { id: professor.id, email: professor.email },
+            SECRET_KEY,
+            { expiresIn: '1h' }
+        );
+
+        res.status(200).json({ message: 'Login bem-sucedido!', token });
+    } catch (error) {
+        console.error('Erro ao autenticar login:', error);
+        res.status(500).json({ error: 'Erro interno ao autenticar login' });
     }
-
-    const senhaCorreta = await bcrypt.compare(password, professor.password);
-
-    if (!senhaCorreta) {
-        return res.status(401).json({ error: 'Senha incorreta' });
-    }
-
-    res.status(200).json({ message: 'Login bem-sucedido!' });
 });
 
-// Listar todos os professores (sem mostrar senha)
-app.get('/professores', async (req, res) => {
-    const professores = await prisma.professor.findMany({
-        select: {
-            id: true,
-            name: true,
-            age: true,
-            email: true,
-            universityId: true,
-            subject: true,
-        },
-    });
-    res.status(200).json(professores);
-});
+// Middleware de autenticação para rotas protegidas
+const autenticarToken = (req, res, next) => {
+    const token = req.headers.authorization?.split(' ')[1];
 
-// Atualizar dados de um professor por ID
-app.put('/professores/:id', async (req, res) => {
-    const { name, age, email, universityId, subject, password } = req.body;
-    const { id } = req.params;
+    if (!token) {
+        return res.status(401).json({ error: 'Acesso negado. Token não fornecido.' });
+    }
 
     try {
+        const decoded = jwt.verify(token, SECRET_KEY);
+        req.user = decoded;
+        next();
+    } catch (error) {
+        return res.status(403).json({ error: 'Token inválido ou expirado.' });
+    }
+};
+
+// Buscar perfil do professor autenticado
+app.get('/perfil', autenticarToken, async (req, res) => {
+    try {
+        const professor = await prisma.professor.findUnique({
+            where: { id: req.user.id },
+            select: { id: true, email: true, name: true, age: true, telefone: true, universityId: true, subject: true }
+        });
+
+        if (!professor) {
+            return res.status(404).json({ error: 'Professor não encontrado' });
+        }
+
+        res.status(200).json(professor);
+    } catch (error) {
+        console.error('Erro ao buscar perfil:', error);
+        res.status(500).json({ error: 'Erro interno ao buscar perfil' });
+    }
+});
+
+// Atualizar dados do professor (após login)
+app.put('/professores/:id', autenticarToken, async (req, res) => {
+    const { id } = req.params;
+    const { nome, age, telefone, universityId, disciplina, email, password } = req.body;
+
+    try {
+        const professorExiste = await prisma.professor.findUnique({
+            where: { id },
+        });
+
+        if (!professorExiste) {
+            return res.status(404).json({ error: 'Professor não encontrado' });
+        }
+
         let dataUpdate = {
-            name,
-            age: age ? String(age) : null,
-            email,
+            name: nome,
+            age: age !== undefined && age !== null ? String(age) : null,
+            telefone,
             universityId,
-            subject,
+            subject: disciplina,
+            email
         };
 
         if (password) {
@@ -96,19 +173,19 @@ app.put('/professores/:id', async (req, res) => {
     }
 });
 
-// Deletar um professor por ID
-app.delete('/professores/:id', async (req, res) => {
-    const { id } = req.params;
-
+// Deletar um professor (somente autenticado)
+app.delete('/professores/:id', autenticarToken, async (req, res) => {
     try {
+        const { id } = req.params;
+
         await prisma.professor.delete({
             where: { id },
         });
 
-        return res.status(204).send();
+        res.status(204).send();
     } catch (error) {
         console.error('Erro ao deletar professor:', error);
-        return res.status(500).json({ error: 'Erro interno ao deletar professor' });
+        res.status(500).json({ error: 'Erro interno ao deletar professor' });
     }
 });
 
@@ -119,6 +196,7 @@ process.on('SIGINT', async () => {
     process.exit();
 });
 
+// Iniciar o servidor
 app.listen(3000, () => {
     console.log('Servidor rodando na porta 3000');
 });
