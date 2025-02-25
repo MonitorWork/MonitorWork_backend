@@ -1,8 +1,9 @@
+npm install express
+npm install mongodb
 npx prisma init 
-intalar o prisma npx prisma@latest init --db 
-instalar o mongo db npm install mongodb
+npx prisma@latest init --db 
 npm install @prisma/client
-rodar o banco npx prisma db push 
-visualizar o banco  npx prisma studio
-
-instalar o npm install bcrypt
+npx prisma db push 
+npx prisma studio
+npm install bcrypt
+npm install jsonwebtoken
