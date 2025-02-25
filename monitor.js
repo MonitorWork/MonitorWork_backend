@@ -48,17 +48,15 @@ app.post('/professores', async (req, res) => {
 
         // Criar o novo professor no banco de dados
         const novoProfessor = await prisma.professor.create({
-            data: {
-                name: nome,
-                
-                telefone,
-                universityId,
-                subject: disciplina,
-                email,
-                password: hashedPassword,
-            },
-        });
-
+          data: {
+              name: nome,
+              telefone,
+              universityId,
+              disciplina, // Alterado de subject para disciplina
+              email,
+              password: hashedPassword,
+          },
+      });
         res.status(201).json(novoProfessor);
     } catch (error) {
         console.error('Erro ao criar professor:', error);
@@ -152,7 +150,7 @@ app.put('/professores/:id', autenticarToken, async (req, res) => {
           
             telefone,
             universityId,
-            subject: disciplina,
+            disciplina,
             email
         };
 
